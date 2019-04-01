@@ -6,13 +6,14 @@ class Solution
     characters_from_film = []
     character_filmography = []
 
-    uri = URI("https://challenges.hackajob.co/swapi/api/people/?search=#{character}")
-    res = Net::HTTP.get(uri)
-    result = JSON.parse(res)
+    uri = URI("https://challenges.hackajob.co/swapi/api/films/?search=#{film}")
+    result = JSON.parse(Net::HTTP.get(uri))
+    characters_links = result['results'][0]['characters']
+    puts characters_links
 
-
-    "#{film}: #{characters_from_film.join(', ')}; #{character_filmography.join(', ')}"
+    character_filmography << 'none' if character_filmography.empty?
+    "#{film}: #{characters_from_film.join(', ')}; #{character}: #{character_filmography.join(', ')}"
   end
 end
 
-puts Solution.new.run('Yoda')
+Solution.new.run("The Force Awakens", "Walter White")
