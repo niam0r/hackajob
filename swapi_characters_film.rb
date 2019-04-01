@@ -1,28 +1,30 @@
 require 'net/http'
 require 'json'
 
-class Solution
-  def run(film, character)
-    characters_from_film = get_characters(film)
-    character_filmography = get_films(character)
+class Solution # :nodoc:
+  BASE_URL = 'https://challenges.hackajob.co/swapi/api'.freeze
 
-    character_filmography << 'none' if character_filmography.empty?
-    "#{film}: #{characters_from_film.sort.join(', ')}; #{character}: #{character_filmography.sort.join(', ')}"
+  def run(film, character)
+    characters = get_characters(film).sort
+    filmography = get_films(character).sort
+
+    filmography << 'none' if filmography.empty?
+    "#{film}: #{characters.join(', ')}; #{character}: #{filmography.join(', ')}"
   end
 
   def get_characters(film)
     characters = []
-    uri = URI("https://challenges.hackajob.co/swapi/api/films/?search=#{film}")
+    uri = URI("#{BASE_URL}/films/?search=#{film}")
     result = JSON.parse(Net::HTTP.get(uri))
     result['results'][0]['characters'].each do |url|
       characters << JSON.parse(Net::HTTP.get(URI(url)))['name']
-      end
+    end
     characters
   end
 
   def get_films(character)
     films = []
-    uri = URI("https://challenges.hackajob.co/swapi/api/people/?search=#{character}")
+    uri = URI("#{BASE_URL}/people/?search=#{character}")
     result = JSON.parse(Net::HTTP.get(uri))
     return films if result['results'].empty?
 
@@ -34,6 +36,4 @@ class Solution
 end
 
 puts Solution.new.run("The Force Awakens", "Poggle the Lesser")
-# Solution.new.run("The Force Awakens", "Walter White")
-
-# puts Solution.new.get_name('https://challenges.hackajob.co/swapi/api/people/1/')
+# puts Solution.new.run("The Force Awakens", "Walter White")
